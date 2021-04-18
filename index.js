@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
 
 client.connect(err => {
     const serviceCollection = client.db("laundryShop").collection("services");
+    const reviewsCollection = client.db("laundryShop").collection("reviews");
+    const bookingsCollection = client.db("laundryShop").collection("booking");
+
+    // Service section api
       app.post('/addService', (req, res) => {
         const services = req.body;
         serviceCollection.insertOne(services)
@@ -41,11 +45,56 @@ client.connect(err => {
       })
 
       app.get('/getServices/:id', (req, res) =>{
-        console.log(req.params.id);
         serviceCollection.find({_id:ObjectID(req.params.id)})
         .toArray((err, docs) => {
           res.send(docs)
-         console.log(docs);
+        })
+      })
+
+      app.post('/delService/:id', (req, res) =>{
+        serviceCollection.deleteOne({_id:ObjectID(req.params.id)})
+        .then(result => {
+          console.log(result);
+        })
+      })
+
+
+
+      // Review section api
+      app.post('/setReview' , (req, res) => {
+          const reviews = req.body
+          reviewsCollection.insertOne(reviews)
+          .then(result => {
+            res.send(result)
+          })
+          .catch(err => console.log(err))
+      })
+
+      app.get('/getReview', (req, res) => {
+        reviewsCollection.find({})
+        .toArray((err, docs) =>{
+          res.send(docs)
+        })
+      })
+
+
+      //Booking section api
+      app.post('/setBookedInfo',(req, res) =>{
+        const bookedInfo = req.body
+        bookingsCollection.insertOne(bookedInfo)
+        .then(result => {
+          res.send(result)
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      })
+
+      app.get('/getBookedInfo',(req, res) =>{
+        const bookedInfo = req.body
+        bookingsCollection.find({})
+        .toArray((err, docs) => {
+          res.send(docs)
         })
       })
   });
